@@ -1,73 +1,194 @@
 .booking-list {
+  scroll-margin-top: var(--space-8);
+
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
+    gap: var(--space-5);
+    padding: var(--space-8);
+    border-bottom: 1px solid var(--color-border);
   }
+
   &__heading {
-    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    letter-spacing: -0.2px;
   }
-  &__count {
-    font-size: 0.9rem;
-    color: #596579;
-    margin-left: 0.25rem;
+
+  &__description {
+    color: var(--color-text-secondary);
+    margin-top: var(--space-2);
+    font-size: var(--text-xs);
   }
-  &__status {
-    color: #596579;
-    font-size: 0.9rem;
-  }
-  &__retry {
-    margin-top: 0.6rem;
-  }
-  &__empty {
-    color: #596579;
-    padding: 2rem 0;
-    text-align: center;
+
+  &__notice {
+    margin: var(--space-7) var(--space-8);
   }
   &__items {
     list-style: none;
-    padding: 0;
+    padding: var(--space-4) var(--space-8);
     margin: 0;
+    min-height: 324px;
+  }
+
+  &__footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-6) var(--space-8);
+    color: var(--color-text-secondary);
+    font-size: var(--text-xs);
+  }
+
+  &__footer > span:first-child {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    background: var(--color-primary);
+    border-radius: 50%;
+  }
+
+  &__create {
+    color: var(--color-primary);
+  }
+
+  @media (max-width: $xsm) {
+    &__refresh-label {
+      display: none;
+    }
+
+    &__header > .button {
+      width: 44px;
+      flex-shrink: 0;
+    }
+  }
+  @media (max-width: $sm) {
+    &__header {
+      padding: var(--space-7);
+    }
+
+    &__header > .button {
+      padding-inline: var(--space-4);
+    }
+
+    &__items {
+      padding-inline: var(--space-6);
+    }
+
+    &__notice {
+      margin-inline: var(--space-6);
+    }
+
+    &__footer {
+      padding-inline: var(--space-7);
+    }
   }
 }
 
 .booking-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1.1rem 0;
-  border-top: 1px solid #e5e9ee;
+  gap: var(--space-7);
+  padding: var(--space-7) 0;
+  border-bottom: 1px solid var(--color-border);
 
-  &--editing {
-    border-left: 3px solid #244f9f;
-    padding-left: 0.75rem;
+  &:last-child {
+    border-bottom: 0;
   }
+
+  &__time {
+    display: flex;
+    flex-direction: column;
+    padding-right: var(--space-7);
+    border-right: 2px solid var(--color-primary-border);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+
+  &__time time {
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    line-height: 1.4;
+  }
+
+  &__time span {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    margin-top: var(--space-2);
+  }
+
   &__details {
+    flex: 1;
     min-width: 0;
   }
-  &__time {
-    font-weight: 650;
-    white-space: nowrap;
-  }
   &__title {
-    margin-top: 0.25rem;
+    font-weight: var(--weight-medium);
     overflow-wrap: anywhere;
   }
-  &__status {
-    color: #596579;
-    font-size: 0.9rem;
-  }
-  &__actions {
+
+  &__meta {
     display: flex;
+    align-items: center;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: var(--space-5);
+    margin-top: var(--space-3);
   }
 
-  @media (max-width: $xsm) {
-    align-items: flex-start;
-    flex-direction: column;
+  &__meta > span:first-child {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+  }
+
+  &__meta svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--space-1);
+  }
+
+  &__delete:hover:not(:disabled) {
+    background: var(--color-danger-soft);
+    border-color: transparent;
+    color: var(--color-danger);
+  }
+
+  &--editing &__time {
+    border-color: var(--color-primary);
+  }
+
+  &--editing &__title {
+    color: var(--color-primary);
+  }
+
+  @media (max-width: $lg) and (min-width: 769px), (max-width: $sm) {
+    gap: var(--space-5);
+    flex-wrap: wrap;
+
+    &__time {
+      padding-right: var(--space-5);
+    }
+
+    &__actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
   }
 }

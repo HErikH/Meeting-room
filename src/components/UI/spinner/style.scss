@@ -1,0 +1,20 @@
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
+
+  .spinner__circle {
+    display: block;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    animation: spinner-rotate 700ms linear infinite;
+  }
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}

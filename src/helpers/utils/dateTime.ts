@@ -46,3 +46,25 @@ export function localTimeInMinutes(date: Date): number {
     date.getMilliseconds() / 60_000
   );
 }
+
+/** Use local noon so calendar navigation is stable across daylight-saving changes. */
+export function parseLocalDate(value: string): Date {
+  return new Date(`${value}T12:00:00`);
+}
+
+export function shiftDate(value: string, days: number): string {
+  const date = parseLocalDate(value);
+  date.setDate(date.getDate() + days);
+  return formatLocalDate(date);
+}
+
+export function formatDisplayDate(
+  value: string,
+  options: Intl.DateTimeFormatOptions = {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  },
+): string {
+  return parseLocalDate(value).toLocaleDateString("en-US", options);
+}

@@ -5,6 +5,7 @@ import { useNow } from "@hooks/useNow";
 import { useIsMutating, useIsSaving, useBookingsStatus } from "@/store";
 import {
   formatLocalDate,
+  formatDisplayDate,
   localTimeInMinutes,
   minutesToTime,
   timeToMinutes,
@@ -15,6 +16,11 @@ import {
   WORKING_DAY_END,
   WORKING_DAY_START,
 } from "@constants/booking";
+import { Button } from "@components/UI/button/Button";
+import { Icon } from "@components/UI/icon/Icon";
+import { Notice } from "@components/UI/notice/Notice";
+import { Badge } from "@components/UI/badge/Badge";
+import { Spinner } from "@components/UI/spinner/Spinner";
 import "./style.scss";
 
 type T_Props = {
@@ -49,6 +55,8 @@ export function BookingForm({
   const closed =
     date < today || firstStart > WORKING_DAY_END - MIN_BOOKING_DURATION;
   const start = timeToMinutes(form.values.start);
+  const end = timeToMinutes(form.values.end);
+  const duration = start !== null && end !== null ? end - start : null;
   const endMin = Math.max(
     WORKING_DAY_START + MIN_BOOKING_DURATION,
     (start ?? WORKING_DAY_START) + MIN_BOOKING_DURATION,
@@ -66,26 +74,51 @@ export function BookingForm({
 
   useEffect(() => {
     if (failedSubmissions === 0) return;
-    formElement.current?.querySelector<HTMLElement>(
-      '[aria-invalid="true"]:not(:disabled), [role="alert"]',
-    )?.focus();
+    formElement.current
+      ?.querySelector<HTMLElement>(
+        '[aria-invalid="true"]:not(:disabled), [role="alert"]',
+      )
+      ?.focus();
   }, [failedSubmissions]);
 
   return (
     <section className="panel booking-form" aria-labelledby="form-heading">
-      <h2 className="booking-form__heading" id="form-heading">
-        {booking ? "Edit booking" : "New booking"}
-      </h2>
-      <p className="booking-form__description">
-        {date} · 30 minutes to 2 hours
-      </p>
+      <div className="booking-form__header">
+        <span className="booking-form__icon">
+          <Icon name={booking ? "edit" : "plus"} />
+        </span>
+        <div>
+          <h2 className="booking-form__heading" id="form-heading">
+            {booking ? "Edit booking" : "New booking"}
+          </h2>
+          <p className="booking-form__description">
+            {booking
+              ? "A small change to your plans."
+              : "Make time for your next meeting."}
+          </p>
+        </div>
+      </div>
+      <div className="booking-form__date">
+        <Icon name="calendar" />
+        <div>
+          <span>Booking for</span>
+          <p>
+            {formatDisplayDate(date, {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </p>
+        </div>
+      </div>
       {closed && (
-        <p className="booking-form__closed-message" role="status">
+        <Notice variant="warning" className="booking-form__closed-message">
           {date < today
             ? "Past dates are available to view only."
             : "No bookable time remains today."}{" "}
           Choose a future date to book.
-        </p>
+        </Notice>
       )}
       <form
         ref={formElement}
@@ -105,7 +138,7 @@ export function BookingForm({
           className="booking-form__fieldset"
           disabled={closed || isMutating}
         >
-          <legend className="booking-form__legend">Booking details</legend>
+          <legend className="sr-only">Booking details</legend>
           <div className="booking-form__time-fields">
             <div className="booking-form__field form-field">
               <label className="form-field__label" htmlFor="booking-start">
@@ -174,6 +207,7 @@ export function BookingForm({
               id="booking-title"
               name="title"
               type="text"
+              placeholder="e.g. Team catch-up"
               value={form.values.title}
               onChange={(event) => {
                 form.change("title", event.target.value);
@@ -181,26 +215,33 @@ export function BookingForm({
               }}
             />
           </div>
+          {duration !== null &&
+            duration >= MIN_BOOKING_DURATION &&
+            duration <= MAX_BOOKING_DURATION && (
+              <div className="booking-form__duration">
+                <Icon name="clock" />
+                <span>Meeting duration</span>
+                <Badge variant="primary">{duration} min</Badge>
+              </div>
+            )}
         </fieldset>
         {(form.error || form.overlapError) && (
-          <p className="notice notice--error" role="alert" tabIndex={-1}>
+          <Notice variant="error" className="booking-form__error" tabIndex={-1}>
             {form.error ?? form.overlapError}
-          </p>
+          </Notice>
         )}
         <div className="booking-form__actions">
-          <button
-            className="button button--primary"
+          <Button
+            variant="primary"
             type="submit"
+            icon={<Icon name={booking ? "check" : "plus"} />}
+            loading={isSaving}
+            loadingLabel="Saving…"
             disabled={closed || isMutating || status !== "success"}
           >
-            {isSaving
-              ? "Saving…"
-              : booking
-                ? "Save changes"
-                : "Create booking"}
-          </button>
-          <button
-            className="button"
+            {booking ? "Save changes" : "Create booking"}
+          </Button>
+          <Button
             type="button"
             disabled={isMutating}
             onClick={() => {
@@ -209,16 +250,25 @@ export function BookingForm({
             }}
           >
             {booking ? "Cancel edit" : "Clear"}
-          </button>
+          </Button>
         </div>
         {!closed && status !== "success" && (
-          <p className="booking-form__status" role="status">
-            {status === "error"
-              ? "Reload bookings before saving."
-              : "Loading availability…"}
-          </p>
+          <div className="booking-form__status">
+            {status === "error" ? (
+              <Notice variant="warning">Reload bookings before saving.</Notice>
+            ) : (
+              <Spinner label="Loading availability…" />
+            )}
+          </div>
         )}
       </form>
+      <div className="booking-form__guidance">
+        <Icon name="info" />
+        <p>
+          Keep it between <strong>30 minutes and 2 hours</strong>, within
+          working hours. Overlapping bookings aren’t allowed.
+        </p>
+      </div>
     </section>
   );
 }

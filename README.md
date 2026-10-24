@@ -49,10 +49,42 @@ UI code should use the shared `bookingsApi` export. To connect a real backend la
 - Successful writes update the displayed list before refreshing it. A failed refresh does not report the completed save as a failed save.
 - Saving/deleting disables competing mutations. Changing dates or editing another booking asks before discarding unsaved details.
 - Loading, empty, error, saving, deleting, and success states are displayed. The layout stacks on narrow screens and uses labeled native controls, focus indicators, and announced status/error messages.
-- Styles use BEM (`block__element--modifier`), with component SCSS files and shared button/input/field/panel/notice blocks in `src/styles/components.scss`.
+- Styles use BEM (`block__element--modifier`), with component SCSS files and shared input/field/panel primitives in `src/styles/components.scss`.
 - `src/styles/base.scss` forwards shared Sass variables, mixins, and functions without emitting CSS. Vite injects it with `@use "@/styles/base" as *;`, so stylesheets imported from TypeScript can use shared variables directly (`$md`, `$xsm`). Import CSS-producing stylesheets from TypeScript so each receives that injection; Sass modules loaded through `@use` have their own scope. Keep stylesheet-specific variables in separate modules and `@use` them only where needed.
 
 To try conflict recovery, open `/?mockConflict=once`, select tomorrow, enter a valid interval and title, and create the booking. The conflict appears alongside the refreshed list, with the form values retained. Choose an adjacent interval and submit again.
+
+## UI components and design tokens
+
+`src/styles/variables/tokens.scss` defines shared colors, typography, spacing, radii, shadows, and transitions. Spacing follows a 2px base with reusable tokens from 2px through 64px. The interface uses an indigo accent, neutral surfaces, visible keyboard focus, and reduced-motion support. The header, room information, date navigation, schedule, and form share these tokens and stack on small screens.
+
+Reusable UI components live in `src/components/UI/`, each with a named export and a colocated `style.scss` where styling is needed:
+
+- `Button`: primary, default, danger, and ghost actions; optional icons and pending labels; automatically disabled while loading.
+- `Spinner` and `Skeleton`: compact progress indicators and initial content placeholders with accessible loading labels.
+- `Notice`: info, success, warning, and error feedback, with optional title, action, and dismissal.
+- `Badge` and `EmptyState`: consistent status labels and helpful empty content.
+- `Icon`: a typed wrapper around the Lucide set from `react-icons`, with consistent sizing, stroke weight, and decorative accessibility defaults. All interface icons and loading spinners use this shared wrapper.
+- `Modal`: controlled, reusable dialogs for deletion and unsaved drafts; supports custom content, titles, descriptions, four variants, disabled confirmation, async actions, and configurable Escape/backdrop dismissal.
+
+The modal uses the HTML dialog element through a React portal. It makes the background inert, contains keyboard focus, initially focuses the safe cancellation action, locks background scrolling, and restores focus on close. A caller can supply a return or fallback focus ref when the original trigger may be removed. Pending confirmations prevent duplicate actions and dismissal. Rejected async confirmations remain open, announce and focus the error, and allow retry; the caller closes the dialog on success:
+
+```tsx
+<Modal
+  open={open}
+  title="Delete this booking?"
+  description="This action cannot be undone."
+  variant="danger"
+  confirmLabel="Delete booking"
+  onClose={() => setOpen(false)}
+  onConfirm={async () => {
+    await removeBooking(); // Reject on failure to keep the modal open.
+    setOpen(false);
+  }}
+/>
+```
+
+The editor stores the pending date/edit/delete action in React state. Cancelling preserves the current draft. Delete errors stay in the confirmation dialog; ordinary load/save errors use inline notices, and successful changes use a dismissible status notice. The API, store mutations, and booking validation rules are unchanged.
 
 ## Business decisions
 
@@ -91,4 +123,4 @@ Before submitting, include the repository link, deployed demo link, this AI conv
 
 ## Remaining work
 
-Remaining: visual polish, deployment, and submission links. Actual time spent and final priorities will be recorded at submission.
+Remaining: deployment and submission links. Actual time spent and final priorities will be recorded at submission.

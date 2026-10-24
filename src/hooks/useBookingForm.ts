@@ -1,8 +1,8 @@
 import { useState } from "react";
 import type {
-  Booking,
-  BookingField,
-  BookingFieldErrors,
+  T_Booking,
+  T_BookingField,
+  T_BookingFieldErrors,
 } from "@app-types/booking";
 import { ApiError } from "@/api/error";
 import { getBookings, useBookings, saveBooking } from "@/store";
@@ -10,7 +10,7 @@ import { validateBooking } from "@utils/bookingRules";
 
 export function useBookingForm(
   date: string,
-  booking: Booking | null,
+  booking: T_Booking | null,
   now: Date,
 ) {
   const initialValues = {
@@ -21,10 +21,10 @@ export function useBookingForm(
   };
   const [values, setValues] = useState(initialValues);
   const [touched, setTouched] = useState<
-    Partial<Record<BookingField, boolean>>
+    Partial<Record<T_BookingField, boolean>>
   >({});
   const [error, setError] = useState<string | null>(null);
-  const [serverErrors, setServerErrors] = useState<BookingFieldErrors>({});
+  const [serverErrors, setServerErrors] = useState<T_BookingFieldErrors>({});
   const bookings = useBookings();
   const validation = validateBooking(values, bookings, {
     now,
@@ -32,7 +32,7 @@ export function useBookingForm(
   });
   const fieldErrors = !validation.valid ? (validation.fieldErrors ?? {}) : {};
 
-  function change(field: BookingField, value: string) {
+  function change(field: T_BookingField, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
     setError(null);
     setServerErrors({});
@@ -75,7 +75,7 @@ export function useBookingForm(
     }
   }
 
-  function fieldError(field: BookingField): string | undefined {
+  function fieldError(field: T_BookingField): string | undefined {
     return (
       serverErrors[field] ?? (touched[field] ? fieldErrors[field] : undefined)
     );
@@ -88,7 +88,7 @@ export function useBookingForm(
     submit,
     error,
     fieldError,
-    touch: (field: BookingField) =>
+    touch: (field: T_BookingField) =>
       setTouched((current) => ({ ...current, [field]: true })),
     overlapError:
       !validation.valid && validation.code === "BOOKING_CONFLICT"

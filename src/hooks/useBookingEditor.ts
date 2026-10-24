@@ -1,9 +1,9 @@
 import { useState } from "react";
-import type { Booking } from "@app-types/booking";
+import type { T_Booking } from "@app-types/booking";
 import { changeDate, deleteBooking, useIsMutating } from "@/store";
 
 export function useBookingEditor(selectedDate: string) {
-  const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
+  const [editingBooking, setEditingBooking] = useState<T_Booking | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [notice, setNotice] = useState("");
   const isMutating = useIsMutating();
@@ -18,7 +18,7 @@ export function useBookingEditor(selectedDate: string) {
     void changeDate(date);
   }
 
-  function editBooking(booking: Booking) {
+  function editBooking(booking: T_Booking) {
     if (editingBooking?.id === booking.id) return;
     if (isDirty && !window.confirm("Discard your unsaved details and edit this booking?")) return;
 
@@ -27,7 +27,7 @@ export function useBookingEditor(selectedDate: string) {
     setNotice("");
   }
 
-  async function removeBooking(booking: Booking) {
+  async function removeBooking(booking: T_Booking) {
     if (!window.confirm(`Delete ${booking.title || "this booking"} (${booking.start}–${booking.end})?`)) return;
     setNotice("");
 

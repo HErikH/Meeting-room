@@ -1,4 +1,4 @@
-import type { Booking } from "@app-types/booking";
+import type { T_Booking } from "@app-types/booking";
 import {
   useBookings,
   useBookingsStatus,
@@ -16,13 +16,13 @@ import {
 import { useNow } from "@hooks/useNow";
 import "./style.scss";
 
-type Props = {
+type T_Props = {
   editingId?: string;
-  onEdit: (booking: Booking) => void;
-  onDelete: (booking: Booking) => void;
+  onEdit: (booking: T_Booking) => void;
+  onDelete: (booking: T_Booking) => void;
 };
 
-export function BookingList({ editingId, onEdit, onDelete }: Props) {
+export function BookingList({ editingId, onEdit, onDelete }: T_Props) {
   const bookings = useBookings();
   const status = useBookingsStatus();
   const error = useBookingsError();
@@ -128,9 +128,9 @@ function EditBookingButton({
   disabled,
   onEdit,
 }: {
-  booking: Booking;
+  booking: T_Booking;
   disabled: boolean;
-  onEdit: (booking: Booking) => void;
+  onEdit: (booking: T_Booking) => void;
 }) {
   const now = useNow();
   const today = formatLocalDate(now);

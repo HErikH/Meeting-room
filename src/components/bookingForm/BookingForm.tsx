@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { Booking } from "@app-types/booking";
+import type { T_Booking } from "@app-types/booking";
 import { useBookingForm } from "@hooks/useBookingForm";
 import { useNow } from "@hooks/useNow";
 import { useIsMutating, useIsSaving, useBookingsStatus } from "@/store";
@@ -17,9 +17,9 @@ import {
 } from "@constants/booking";
 import "./style.scss";
 
-type Props = {
+type T_Props = {
   date: string;
-  booking: Booking | null;
+  booking: T_Booking | null;
   onDirty: () => void;
   onCancel: () => void;
   onSaved: () => void;
@@ -31,7 +31,7 @@ export function BookingForm({
   onDirty,
   onCancel,
   onSaved,
-}: Props) {
+}: T_Props) {
   const now = useNow();
   const startInput = useRef<HTMLInputElement>(null);
   const editingId = booking?.id;

@@ -1,6 +1,6 @@
-import type { BookingsState } from "./types";
+import type { T_BookingsState } from "./types";
 
-export const INITIAL_BOOKINGS_STATE: Omit<BookingsState, "selectedDate"> = {
+export const INITIAL_BOOKINGS_STATE: Omit<T_BookingsState, "selectedDate"> = {
   bookings: [],
   status: "idle",
   error: null,

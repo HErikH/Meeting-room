@@ -1,7 +1,7 @@
-import type { BookingFieldErrors } from './booking';
+import type { T_BookingFieldErrors } from './booking';
 
-export type ApiErrorResponse = {
+export type T_ApiErrorResponse = {
   message: string;
   code?: string;
-  fieldErrors?: BookingFieldErrors;
+  fieldErrors?: T_BookingFieldErrors;
 };

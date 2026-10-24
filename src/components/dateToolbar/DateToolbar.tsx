@@ -3,12 +3,12 @@ import { formatLocalDate } from "@utils/dateTime";
 import { useIsMutating } from "@/store";
 import "./style.scss";
 
-type Props = {
+type T_Props = {
   date: string;
   onChange: (date: string) => void;
 };
 
-export function DateToolbar({ date, onChange }: Props) {
+export function DateToolbar({ date, onChange }: T_Props) {
   const isMutating = useIsMutating();
 
   return (
@@ -35,7 +35,7 @@ function TodayButton({
   date,
   disabled,
   onChange,
-}: Props & { disabled: boolean }) {
+}: T_Props & { disabled: boolean }) {
   const today = formatLocalDate(useNow());
 
   return (

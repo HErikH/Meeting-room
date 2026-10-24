@@ -3,9 +3,9 @@ import { bookingsApi } from "@/api/bookings";
 import { ApiError } from "@/api/error";
 import { formatLocalDate, isValidDate } from "@utils/dateTime";
 import { INITIAL_BOOKINGS_STATE } from "./constants";
-import type { BookingsStore } from "./types";
+import type { T_BookingsStore } from "./types";
 
-export const useBookingsStore = create<BookingsStore>((set, get) => {
+export const useBookingsStore = create<T_BookingsStore>((set, get) => {
   let controller: AbortController | undefined;
   let requestId = 0;
 

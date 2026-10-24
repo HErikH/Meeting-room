@@ -1,12 +1,12 @@
-import type { ApiErrorResponse } from '@app-types/api';
-import type { BookingFieldErrors } from '@app-types/booking';
+import type { T_ApiErrorResponse } from '@app-types/api';
+import type { T_BookingFieldErrors } from '@app-types/booking';
 
 export class ApiError extends Error {
   readonly status: number;
   readonly code?: string;
-  readonly fieldErrors?: BookingFieldErrors;
+  readonly fieldErrors?: T_BookingFieldErrors;
 
-  constructor(status: number, payload: ApiErrorResponse) {
+  constructor(status: number, payload: T_ApiErrorResponse) {
     super(payload.message);
 
     this.name = 'ApiError';

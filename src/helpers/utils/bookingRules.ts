@@ -5,14 +5,14 @@ import {
   WORKING_DAY_START,
 } from '@constants/booking';
 import type {
-  Booking,
-  BookingFieldErrors,
-  BookingValidationResult,
-  CreateBookingInput,
+  T_Booking,
+  T_BookingFieldErrors,
+  T_BookingValidationResult,
+  T_CreateBookingInput,
 } from '@app-types/booking';
 import { formatLocalDate, isValidDate, localTimeInMinutes, timeToMinutes } from './dateTime';
 
-export type BookingValidationOptions = {
+export type T_BookingValidationOptions = {
   now?: Date;
   excludeId?: string;
 };
@@ -27,11 +27,11 @@ export function intervalsOverlap(
 }
 
 export function validateBooking(
-  input: CreateBookingInput,
-  bookings: readonly Booking[],
-  { now = new Date(), excludeId }: BookingValidationOptions = {},
-): BookingValidationResult {
-  const fieldErrors: BookingFieldErrors = {};
+  input: T_CreateBookingInput,
+  bookings: readonly T_Booking[],
+  { now = new Date(), excludeId }: T_BookingValidationOptions = {},
+): T_BookingValidationResult {
+  const fieldErrors: T_BookingFieldErrors = {};
   const today = formatLocalDate(now);
   const start = timeToMinutes(input.start);
   const end = timeToMinutes(input.end);

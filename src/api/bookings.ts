@@ -1,9 +1,9 @@
-import type { Booking, CreateBookingInput, UpdateBookingInput } from '@app-types/booking';
+import type { T_Booking, T_CreateBookingInput, T_UpdateBookingInput } from '@app-types/booking';
 import { validateBooking } from '@utils/bookingRules';
 import { isValidDate } from '@utils/dateTime';
 import { ApiError } from './error';
 
-type MockApiOptions = {
+type T_MockApiOptions = {
   delayMs?: number;
   now?: () => Date;
   conflictNextCreate?: boolean;
@@ -13,8 +13,8 @@ export function createBookingsApi({
   delayMs = 300,
   now = () => new Date(),
   conflictNextCreate = false,
-}: MockApiOptions = {}) {
-  const bookings: Booking[] = [];
+}: T_MockApiOptions = {}) {
+  const bookings: T_Booking[] = [];
   let pendingConflict = conflictNextCreate;
 
   async function wait(signal?: AbortSignal): Promise<void> {
@@ -25,7 +25,7 @@ export function createBookingsApi({
     signal?.throwIfAborted();
   }
 
-  function assertValid(input: CreateBookingInput, excludeId?: string): void {
+  function assertValid(input: T_CreateBookingInput, excludeId?: string): void {
     const result = validateBooking(input, bookings, { now: now(), excludeId });
 
     if (!result.valid) {
@@ -48,7 +48,7 @@ export function createBookingsApi({
   }
 
   return {
-    async list(date: string, signal?: AbortSignal): Promise<Booking[]> {
+    async list(date: string, signal?: AbortSignal): Promise<T_Booking[]> {
       await wait(signal);
 
       if (!isValidDate(date)) {
@@ -61,7 +61,7 @@ export function createBookingsApi({
         .map((booking) => ({ ...booking }));
     },
 
-    async create(input: CreateBookingInput): Promise<Booking> {
+    async create(input: T_CreateBookingInput): Promise<T_Booking> {
       // Snapshot the submitted values before waiting; the form may change meanwhile.
       const draft = { ...input };
       await wait();
@@ -77,20 +77,20 @@ export function createBookingsApi({
       }
 
       // Validate and commit without another await, so simultaneous saves cannot both win.
-      const booking: Booking = { ...draft, id: crypto.randomUUID() };
+      const booking: T_Booking = { ...draft, id: crypto.randomUUID() };
 
       bookings.push(booking);
 
       return { ...booking };
     },
 
-    async update(id: string, input: UpdateBookingInput): Promise<Booking> {
+    async update(id: string, input: T_UpdateBookingInput): Promise<T_Booking> {
       const changes = { ...input };
       
       await wait();
 
       const index = findIndex(id);
-      const booking: Booking = { ...bookings[index], ...changes, id };
+      const booking: T_Booking = { ...bookings[index], ...changes, id };
 
       assertValid(booking, id);
 

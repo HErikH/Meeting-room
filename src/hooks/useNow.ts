@@ -6,6 +6,7 @@ export function useNow(): Date {
   useEffect(() => {
     const update = () => setNow(new Date());
     const timer = window.setInterval(update, 1000);
+
     window.addEventListener("focus", update);
 
     return () => {

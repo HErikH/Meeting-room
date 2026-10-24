@@ -22,7 +22,9 @@ export const useBookingsStore = create<T_BookingsStore>((set, get) => {
         get().deletingId
       )
         return;
+
       controller?.abort();
+
       set({
         selectedDate: date,
         bookings: [],
@@ -30,6 +32,7 @@ export const useBookingsStore = create<T_BookingsStore>((set, get) => {
         error: null,
         deleteError: null,
       });
+
       await get().refreshBookings();
     },
 
@@ -51,6 +54,7 @@ export const useBookingsStore = create<T_BookingsStore>((set, get) => {
           date !== get().selectedDate
         )
           return;
+
         set({ bookings, status: "success" });
       } catch (error) {
         if (
@@ -59,6 +63,7 @@ export const useBookingsStore = create<T_BookingsStore>((set, get) => {
           date !== get().selectedDate
         )
           return;
+
         set({
           status: "error",
           error:
@@ -70,6 +75,7 @@ export const useBookingsStore = create<T_BookingsStore>((set, get) => {
     async saveBooking(input, id) {
       if (get().isSaving || get().deletingId)
         throw new Error("Please wait for the current change to finish.");
+
       set({ isSaving: true, deleteError: null });
 
       try {
@@ -109,20 +115,25 @@ export const useBookingsStore = create<T_BookingsStore>((set, get) => {
 
       try {
         await bookingsApi.remove(id);
+
         set((state) => ({
           bookings: state.bookings.filter((booking) => booking.id !== id),
         }));
+
         await get().refreshBookings();
+
         return true;
       } catch (error) {
         if (error instanceof ApiError && error.status === 404)
           await get().refreshBookings();
+
         set({
           deleteError:
             error instanceof Error
               ? error.message
               : "Unable to delete this booking.",
         });
+
         return false;
       } finally {
         set({ deletingId: null });

@@ -27,10 +27,12 @@ export function useBookingEditor(selectedDate: string) {
 
   function selectDate(date: string) {
     if (!isValidDate(date) || date === selectedDate || isMutating) return;
+
     if (isDirty) {
       setPendingAction({ type: "date", date });
       return;
     }
+
     openDate(date);
   }
 
@@ -47,6 +49,7 @@ export function useBookingEditor(selectedDate: string) {
       setPendingAction({ type: "edit", booking });
       return;
     }
+
     openEditor(booking);
   }
 
@@ -63,18 +66,22 @@ export function useBookingEditor(selectedDate: string) {
       openEditor(pendingAction.booking);
     } else {
       setNotice("");
+
       if (!(await deleteBooking(pendingAction.booking.id))) {
         throw new Error(
           useBookingsStore.getState().deleteError ??
             "Unable to delete this booking. Please try again.",
         );
       }
+
       if (editingBooking?.id === pendingAction.booking.id) {
         setEditingBooking(null);
         setIsDirty(false);
       }
+
       setNotice("Booking deleted.");
     }
+
     setPendingAction(null);
   }
 

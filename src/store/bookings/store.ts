@@ -48,6 +48,7 @@ export const useBookingsStore = create<T_BookingsStore>((set, get) => {
 
       try {
         const bookings = await bookingsApi.list(date, signal);
+        
         if (
           signal.aborted ||
           currentRequest !== requestId ||

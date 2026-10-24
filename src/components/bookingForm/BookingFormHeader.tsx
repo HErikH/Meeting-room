@@ -1,6 +1,6 @@
 import { Icon } from "@UI/icon/Icon";
 
-export function BookingHeader({
+export function BookingFormHeader({
   icon,
   heading,
   description,

@@ -11,10 +11,10 @@ import { Notice } from "@UI/notice/Notice";
 import { Badge } from "@UI/badge/Badge";
 import { getBookingWindow, getValidDuration } from "@utils/bookingWindow";
 import { TimeField } from "./TimeField";
-import "./style.scss";
-import { BookingHeader } from "./BookingHeader";
+import { BookingFormHeader } from "./BookingFormHeader";
 import { DateSummary } from "./DateSummery";
 import { AvailabilityStatus } from "./AvailabilityStatus";
+import "./style.scss";
 
 const COPY = {
   create: {
@@ -99,7 +99,7 @@ export function BookingForm({
 
   return (
     <section className="panel booking-form" aria-labelledby="form-heading">
-      <BookingHeader
+      <BookingFormHeader
         icon={copy.icon}
         heading={copy.heading}
         description={copy.description}

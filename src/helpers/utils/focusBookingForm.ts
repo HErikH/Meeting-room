@@ -4,7 +4,9 @@ export function focusBookingForm() {
   ) as HTMLInputElement | null;
 
   const target =
-    input && !input.disabled ? input : document.getElementById("selected-date");
+    input && !input.matches(":disabled")
+      ? input
+      : document.getElementById("selected-date");
 
   target?.scrollIntoView({
     behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches

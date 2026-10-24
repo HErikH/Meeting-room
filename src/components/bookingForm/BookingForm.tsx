@@ -1,27 +1,42 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { T_Booking } from "@app-types/booking";
 import { useBookingForm } from "@hooks/useBookingForm";
+import { useFocusFirstInvalid } from "@hooks/useFocusFirstInvalid";
 import { useNow } from "@hooks/useNow";
 import { useIsMutating, useIsSaving, useBookingsStatus } from "@/store";
-import {
-  formatLocalDate,
-  formatDisplayDate,
-  localTimeInMinutes,
-  minutesToTime,
-  timeToMinutes,
-} from "@utils/dateTime";
-import {
-  MAX_BOOKING_DURATION,
-  MIN_BOOKING_DURATION,
-  WORKING_DAY_END,
-  WORKING_DAY_START,
-} from "@constants/booking";
+import { timeToMinutes } from "@utils/dateTime";
 import { Button } from "@UI/button/Button";
 import { Icon } from "@UI/icon/Icon";
 import { Notice } from "@UI/notice/Notice";
 import { Badge } from "@UI/badge/Badge";
-import { Spinner } from "@UI/spinner/Spinner";
+import { getBookingWindow, getValidDuration } from "@utils/bookingWindow";
+import { TimeField } from "./TimeField";
 import "./style.scss";
+import { BookingHeader } from "./BookingHeader";
+import { DateSummary } from "./DateSummery";
+import { AvailabilityStatus } from "./AvailabilityStatus";
+
+const COPY = {
+  create: {
+    icon: "plus",
+    heading: "New booking",
+    description: "Make time for your next meeting.",
+    submit: "Create booking",
+    cancel: "Clear",
+  },
+  edit: {
+    icon: "edit",
+    heading: "Edit booking",
+    description: "A small change to your plans.",
+    submit: "Save changes",
+    cancel: "Cancel edit",
+  },
+} as const;
+
+const CLOSED_MESSAGE = {
+  past: "Past dates are available to view only.",
+  full: "No bookable time remains today.",
+} as const;
 
 type T_Props = {
   date: string;
@@ -39,165 +54,98 @@ export function BookingForm({
   onSaved,
 }: T_Props) {
   const now = useNow();
-  const formElement = useRef<HTMLFormElement>(null);
-  const startInput = useRef<HTMLInputElement>(null);
-  const [failedSubmissions, setFailedSubmissions] = useState(0);
-  const editingId = booking?.id;
   const form = useBookingForm(date, booking, now);
   const isMutating = useIsMutating();
   const isSaving = useIsSaving();
   const status = useBookingsStatus();
-  const today = formatLocalDate(now);
-  const firstStart =
-    date === today
-      ? Math.max(WORKING_DAY_START, Math.ceil(localTimeInMinutes(now)))
-      : WORKING_DAY_START;
-  const closed =
-    date < today || firstStart > WORKING_DAY_END - MIN_BOOKING_DURATION;
+
+  const formElement = useRef<HTMLFormElement>(null);
+  const startInput = useRef<HTMLInputElement>(null);
+  const [failedSubmissions, setFailedSubmissions] = useState(0);
+
+  const copy = booking ? COPY.edit : COPY.create;
   const start = timeToMinutes(form.values.start);
   const end = timeToMinutes(form.values.end);
-  const duration = start !== null && end !== null ? end - start : null;
-  const endMin = Math.max(
-    WORKING_DAY_START + MIN_BOOKING_DURATION,
-    (start ?? WORKING_DAY_START) + MIN_BOOKING_DURATION,
-  );
-  const endMax = Math.min(
-    WORKING_DAY_END,
-    (start ?? WORKING_DAY_END) + MAX_BOOKING_DURATION,
-  );
-  const startError = form.fieldError("start");
-  const endError = form.fieldError("end");
+  const slots = getBookingWindow(date, now, start);
+  const duration = getValidDuration(start, end);
+
+  const closed = slots.closedReason !== null;
+  const locked = closed || isMutating;
+  const canSubmit = !locked && status === "success";
+  const formError = form.error ?? form.overlapError;
 
   useEffect(() => {
-    if (editingId) startInput.current?.focus();
-  }, [editingId]);
+    if (booking?.id) startInput.current?.focus();
+  }, [booking?.id]);
 
-  useEffect(() => {
-    if (failedSubmissions === 0) return;
-    formElement.current
-      ?.querySelector<HTMLElement>(
-        '[aria-invalid="true"]:not(:disabled), [role="alert"]',
-      )
-      ?.focus();
-  }, [failedSubmissions]);
+  useFocusFirstInvalid(formElement, failedSubmissions);
+
+  const change = (field: "start" | "end" | "title", value: string) => {
+    form.change(field, value);
+    onDirty();
+  };
+
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!canSubmit) return;
+    if (await form.submit()) onSaved();
+    else setFailedSubmissions((count) => count + 1);
+  };
+
+  const handleCancel = () => {
+    form.reset();
+    onCancel();
+  };
 
   return (
     <section className="panel booking-form" aria-labelledby="form-heading">
-      <div className="booking-form__header">
-        <span className="booking-form__icon">
-          <Icon name={booking ? "edit" : "plus"} />
-        </span>
-        <div>
-          <h2 className="booking-form__heading" id="form-heading">
-            {booking ? "Edit booking" : "New booking"}
-          </h2>
-          <p className="booking-form__description">
-            {booking
-              ? "A small change to your plans."
-              : "Make time for your next meeting."}
-          </p>
-        </div>
-      </div>
-      <div className="booking-form__date">
-        <Icon name="calendar" />
-        <div>
-          <span>Booking for</span>
-          <p>
-            {formatDisplayDate(date, {
-              weekday: "short",
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })}
-          </p>
-        </div>
-      </div>
-      {closed && (
+      <BookingHeader
+        icon={copy.icon}
+        heading={copy.heading}
+        description={copy.description}
+      />
+
+      <DateSummary date={date} />
+
+      {slots.closedReason && (
         <Notice variant="warning" className="booking-form__closed-message">
-          {date < today
-            ? "Past dates are available to view only."
-            : "No bookable time remains today."}{" "}
-          Choose a future date to book.
+          {CLOSED_MESSAGE[slots.closedReason]} Choose a future date to book.
         </Notice>
       )}
+
       <form
         ref={formElement}
         aria-busy={isSaving}
         noValidate
-        onSubmit={async (event) => {
-          event.preventDefault();
-          if (closed || isMutating || status !== "success") return;
-          if (await form.submit()) {
-            onSaved();
-          } else {
-            setFailedSubmissions((count) => count + 1);
-          }
-        }}
+        onSubmit={handleSubmit}
       >
-        <fieldset
-          className="booking-form__fieldset"
-          disabled={closed || isMutating}
-        >
+        <fieldset className="booking-form__fieldset" disabled={locked}>
           <legend className="sr-only">Booking details</legend>
+
           <div className="booking-form__time-fields">
-            <div className="booking-form__field form-field">
-              <label className="form-field__label" htmlFor="booking-start">
-                Start time
-              </label>
-              <input
-                ref={startInput}
-                className={startError ? "input input--invalid" : "input"}
-                id="booking-start"
-                name="start"
-                type="time"
-                required
-                step="60"
-                min={minutesToTime(firstStart)}
-                max={minutesToTime(WORKING_DAY_END - MIN_BOOKING_DURATION)}
-                value={form.values.start}
-                aria-invalid={Boolean(startError)}
-                aria-describedby={startError ? "start-error" : undefined}
-                onBlur={() => form.touch("start")}
-                onChange={(event) => {
-                  form.change("start", event.target.value);
-                  onDirty();
-                }}
-              />
-              {startError && (
-                <p id="start-error" className="form-field__error">
-                  {startError}
-                </p>
-              )}
-            </div>
-            <div className="booking-form__field form-field">
-              <label className="form-field__label" htmlFor="booking-end">
-                End time
-              </label>
-              <input
-                className={endError ? "input input--invalid" : "input"}
-                id="booking-end"
-                name="end"
-                type="time"
-                required
-                step="60"
-                min={minutesToTime(endMin)}
-                max={minutesToTime(endMax)}
-                value={form.values.end}
-                aria-invalid={Boolean(endError)}
-                aria-describedby={endError ? "end-error" : undefined}
-                onBlur={() => form.touch("end")}
-                onChange={(event) => {
-                  form.change("end", event.target.value);
-                  onDirty();
-                }}
-              />
-              {endError && (
-                <p id="end-error" className="form-field__error">
-                  {endError}
-                </p>
-              )}
-            </div>
+            <TimeField
+              name="start"
+              label="Start time"
+              inputRef={startInput}
+              value={form.values.start}
+              error={form.fieldError("start")}
+              min={slots.startMin}
+              max={slots.startMax}
+              onBlur={() => form.touch("start")}
+              onChange={(value) => change("start", value)}
+            />
+            <TimeField
+              name="end"
+              label="End time"
+              value={form.values.end}
+              error={form.fieldError("end")}
+              min={slots.endMin}
+              max={slots.endMax}
+              onBlur={() => form.touch("end")}
+              onChange={(value) => change("end", value)}
+            />
           </div>
+
           <div className="booking-form__field form-field">
             <label className="form-field__label" htmlFor="booking-title">
               Title <span className="form-field__hint">(optional)</span>
@@ -209,27 +157,25 @@ export function BookingForm({
               type="text"
               placeholder="e.g. Team catch-up"
               value={form.values.title}
-              onChange={(event) => {
-                form.change("title", event.target.value);
-                onDirty();
-              }}
+              onChange={(event) => change("title", event.target.value)}
             />
           </div>
-          {duration !== null &&
-            duration >= MIN_BOOKING_DURATION &&
-            duration <= MAX_BOOKING_DURATION && (
-              <div className="booking-form__duration">
-                <Icon name="clock" />
-                <span>Meeting duration</span>
-                <Badge variant="primary">{duration} min</Badge>
-              </div>
-            )}
+
+          {duration !== null && (
+            <div className="booking-form__duration">
+              <Icon name="clock" />
+              <span>Meeting duration</span>
+              <Badge variant="primary">{duration} min</Badge>
+            </div>
+          )}
         </fieldset>
-        {(form.error || form.overlapError) && (
+
+        {formError && (
           <Notice variant="error" className="booking-form__error" tabIndex={-1}>
-            {form.error ?? form.overlapError}
+            {formError}
           </Notice>
         )}
+
         <div className="booking-form__actions">
           <Button
             variant="primary"
@@ -237,31 +183,20 @@ export function BookingForm({
             icon={<Icon name={booking ? "check" : "plus"} />}
             loading={isSaving}
             loadingLabel="Saving…"
-            disabled={closed || isMutating || status !== "success"}
+            disabled={!canSubmit}
           >
-            {booking ? "Save changes" : "Create booking"}
+            {copy.submit}
           </Button>
-          <Button
-            type="button"
-            disabled={isMutating}
-            onClick={() => {
-              form.reset();
-              onCancel();
-            }}
-          >
-            {booking ? "Cancel edit" : "Clear"}
+          <Button type="button" disabled={isMutating} onClick={handleCancel}>
+            {copy.cancel}
           </Button>
         </div>
+
         {!closed && status !== "success" && (
-          <div className="booking-form__status">
-            {status === "error" ? (
-              <Notice variant="warning">Reload bookings before saving.</Notice>
-            ) : (
-              <Spinner label="Loading availability…" />
-            )}
-          </div>
+          <AvailabilityStatus status={status} />
         )}
       </form>
+
       <div className="booking-form__guidance">
         <Icon name="info" />
         <p>

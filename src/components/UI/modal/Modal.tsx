@@ -7,9 +7,9 @@ import {
   type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
-import { Button } from "../button/Button";
-import { Icon } from "../icon/Icon";
-import { Notice } from "../notice/Notice";
+import { Button } from "@UI/button/Button";
+import { Icon } from "@UI/icon/Icon";
+import { Notice } from "@UI/notice/Notice";
 import "./style.scss";
 
 type T_Props = {

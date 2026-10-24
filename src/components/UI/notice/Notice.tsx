@@ -1,6 +1,6 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from "react";
-import { Button } from "../button/Button";
-import { Icon } from "../icon/Icon";
+import { Button } from "@UI/button/Button";
+import { Icon } from "@UI/icon/Icon";
 import "./style.scss";
 
 type T_Props = HTMLAttributes<HTMLDivElement> & {

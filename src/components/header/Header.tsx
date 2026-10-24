@@ -1,4 +1,4 @@
-import { Icon } from "@components/UI/icon/Icon";
+import { Icon } from "@UI/icon/Icon";
 import "./style.scss";
 
 export function Header() {

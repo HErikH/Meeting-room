@@ -10,6 +10,7 @@ export default defineConfig({
     alias: {
       "@": src,
       "@components": `${src}/components`,
+      "@UI": `${src}/components/UI`,
       "@hooks": `${src}/hooks`,
       "@utils": `${src}/helpers/utils`,
       "@constants": `${src}/helpers/constants`,

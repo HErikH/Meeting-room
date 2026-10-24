@@ -16,11 +16,11 @@ import {
   WORKING_DAY_END,
   WORKING_DAY_START,
 } from "@constants/booking";
-import { Button } from "@components/UI/button/Button";
-import { Icon } from "@components/UI/icon/Icon";
-import { Notice } from "@components/UI/notice/Notice";
-import { Badge } from "@components/UI/badge/Badge";
-import { Spinner } from "@components/UI/spinner/Spinner";
+import { Button } from "@UI/button/Button";
+import { Icon } from "@UI/icon/Icon";
+import { Notice } from "@UI/notice/Notice";
+import { Badge } from "@UI/badge/Badge";
+import { Spinner } from "@UI/spinner/Spinner";
 import "./style.scss";
 
 type T_Props = {

@@ -16,12 +16,12 @@ import {
   timeToMinutes,
 } from "@utils/dateTime";
 import { useNow } from "@hooks/useNow";
-import { Button } from "@components/UI/button/Button";
-import { Icon } from "@components/UI/icon/Icon";
-import { Badge } from "@components/UI/badge/Badge";
-import { Notice } from "@components/UI/notice/Notice";
-import { Skeleton } from "@components/UI/skeleton/Skeleton";
-import { EmptyState } from "@components/UI/emptyState/EmptyState";
+import { Button } from "@UI/button/Button";
+import { Icon } from "@UI/icon/Icon";
+import { Badge } from "@UI/badge/Badge";
+import { Notice } from "@UI/notice/Notice";
+import { Skeleton } from "@UI/skeleton/Skeleton";
+import { EmptyState } from "@UI/emptyState/EmptyState";
 import "./style.scss";
 
 type T_Props = {

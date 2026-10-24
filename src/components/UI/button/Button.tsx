@@ -1,5 +1,5 @@
 import type { ComponentProps, ReactNode } from "react";
-import { Spinner } from "../spinner/Spinner";
+import { Spinner } from "@UI/spinner/Spinner";
 import "./style.scss";
 
 type T_Props = ComponentProps<"button"> & {

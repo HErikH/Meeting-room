@@ -2,14 +2,15 @@ import { useEffect, useRef } from "react";
 import { useBookingEditor } from "@hooks/useBookingEditor";
 import { refreshBookings, useSelectedDate, useIsMutating } from "@/store";
 import { formatDisplayDate } from "@utils/dateTime";
+import { focusBookingForm } from "@utils/focusBookingForm";
 import { BookingForm } from "@components/bookingForm/BookingForm";
 import { BookingList } from "@components/bookingList/BookingList";
 import { DateToolbar } from "@components/dateToolbar/DateToolbar";
 import { Header } from "@components/header/Header";
-import { Button } from "@components/UI/button/Button";
-import { Icon } from "@components/UI/icon/Icon";
-import { Notice } from "@components/UI/notice/Notice";
-import { Modal } from "@components/UI/modal/Modal";
+import { Button } from "@UI/button/Button";
+import { Icon } from "@UI/icon/Icon";
+import { Notice } from "@UI/notice/Notice";
+import { Modal } from "@UI/modal/Modal";
 import "./style.scss";
 
 export function BookingPage() {
@@ -23,23 +24,6 @@ export function BookingPage() {
   useEffect(() => {
     void refreshBookings();
   }, []);
-
-  function focusBookingForm() {
-    const input = document.getElementById(
-      "booking-start",
-    ) as HTMLInputElement | null;
-    const target =
-      input && !input.disabled
-        ? input
-        : document.getElementById("selected-date");
-    target?.scrollIntoView({
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "instant"
-        : "smooth",
-      block: "center",
-    });
-    target?.focus({ preventScroll: true });
-  }
 
   return (
     <>

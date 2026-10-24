@@ -7,8 +7,8 @@ import {
   shiftDate,
 } from "@utils/dateTime";
 import { useIsMutating } from "@/store";
-import { Button } from "@components/UI/button/Button";
-import { Icon } from "@components/UI/icon/Icon";
+import { Button } from "@UI/button/Button";
+import { Icon } from "@UI/icon/Icon";
 import "./style.scss";
 
 type T_Props = { date: string; onChange: (date: string) => void };

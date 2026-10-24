@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Icon, type T_IconName } from "../icon/Icon";
+import { Icon, type T_IconName } from "@UI/icon/Icon";
 import "./style.scss";
 
 export function EmptyState({

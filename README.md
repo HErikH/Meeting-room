@@ -44,6 +44,7 @@ UI code should use the shared `bookingsApi` export. To connect a real backend la
 - The Zustand bookings store owns the selected date, fetched list, loading/errors, and mutation actions. Stale date responses are ignored.
 - `App` renders `BookingPage`; `DateToolbar` owns the date controls, and `useBookingEditor` owns editing, dirty checks, confirmations, and notices. The store's `changeDate` action selects and loads a date, with separate save/delete/refresh actions.
 - Clock subscriptions live in the form and time-sensitive Today/Edit buttons. Clock ticks do not rerender the page. Edit focus uses an input ref inside `BookingForm`.
+- Failed submissions focus the first invalid field or the error message. Cancel/Clear remains available when a date becomes unbookable; submitting and competing mutations remain disabled.
 - Form values and validation feedback stay in local React state. A `409` refreshes bookings and keeps the entered values and editing ID. If that refresh also fails, the list offers Retry while the draft remains intact.
 - Successful writes update the displayed list before refreshing it. A failed refresh does not report the completed save as a failed save.
 - Saving/deleting disables competing mutations. Changing dates or editing another booking asks before discarding unsaved details.
@@ -62,6 +63,32 @@ To try conflict recovery, open `/?mockConflict=once`, select tomorrow, enter a v
 - A start exactly equal to now is valid; any elapsed part of that minute makes it past.
 - Validation and writing happen without an intervening await, so simultaneous overlapping saves cannot both succeed.
 
+## Manual verification
+
+Use tomorrow for the normal booking flow so the checks do not depend on the current time.
+
+| Check | Expected behavior |
+| --- | --- |
+| Create 09:00–09:30 and 16:00–18:00 | Both duration limits and working-hour boundaries are accepted |
+| Create 10:00–10:29, 10:00–12:01, or equal/reversed times | Field errors appear and nothing is saved |
+| Create 10:00–11:00, then 11:00–12:00 | Adjacent bookings are accepted; overlapping intervals are rejected |
+| Edit a booking's title without changing its interval | No self-conflict |
+| Open `?mockConflict=once` and submit a valid booking | Conflict message, refreshed list, and retained draft; correct the interval and retry |
+| Refresh or change dates quickly | Selected date stays consistent; refresh keeps any draft |
+| Change dates with unsaved values and dismiss confirmation | Original date and entered values stay visible |
+| Delete a booking | Confirmation, pending state, and updated list |
+| View yesterday or enter past time today | Creation is unavailable; past bookings remain viewable |
+| Submit invalid values with a keyboard | Focus moves to the first invalid field; errors are associated with their fields |
+| View at 320px and use Tab through the interface | No horizontal overflow, visible focus, and labeled controls |
+
+The in-memory API can reject a save independently of the UI. Refresh failures, conflict-plus-refresh failures, and failed deletes were also checked in a temporary browser session; no test runner or test files are included.
+
+## Deployment and submission
+
+This is a static Vite app. On Vercel or Netlify, use Node 24, build command `npm run build`, and output directory `dist`. There is no separate API process, environment configuration, or database. Reloading the deployed demo resets its in-memory data.
+
+Before submitting, include the repository link, deployed demo link, this AI conversation, and actual time spent in the README. No hosted demo has been created yet.
+
 ## Remaining work
 
-Remaining: visual polish, final review, deployment, and submission links. Actual time spent and final priorities will be recorded at submission.
+Remaining: visual polish, deployment, and submission links. Actual time spent and final priorities will be recorded at submission.

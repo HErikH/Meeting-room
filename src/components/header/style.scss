@@ -1,0 +1,14 @@
+.header {
+  margin-bottom: 2rem;
+
+  &__title {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    line-height: 1.25;
+  }
+
+  &__subtitle {
+    color: #596579;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+}

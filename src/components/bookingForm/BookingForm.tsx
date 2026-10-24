@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { T_Booking } from "@app-types/booking";
 import { useBookingForm } from "@hooks/useBookingForm";
 import { useNow } from "@hooks/useNow";
@@ -33,7 +33,9 @@ export function BookingForm({
   onSaved,
 }: T_Props) {
   const now = useNow();
+  const formElement = useRef<HTMLFormElement>(null);
   const startInput = useRef<HTMLInputElement>(null);
+  const [failedSubmissions, setFailedSubmissions] = useState(0);
   const editingId = booking?.id;
   const form = useBookingForm(date, booking, now);
   const isMutating = useIsMutating();
@@ -62,6 +64,13 @@ export function BookingForm({
     if (editingId) startInput.current?.focus();
   }, [editingId]);
 
+  useEffect(() => {
+    if (failedSubmissions === 0) return;
+    formElement.current?.querySelector<HTMLElement>(
+      '[aria-invalid="true"]:not(:disabled), [role="alert"]',
+    )?.focus();
+  }, [failedSubmissions]);
+
   return (
     <section className="panel booking-form" aria-labelledby="form-heading">
       <h2 className="booking-form__heading" id="form-heading">
@@ -79,11 +88,17 @@ export function BookingForm({
         </p>
       )}
       <form
+        ref={formElement}
+        aria-busy={isSaving}
         noValidate
         onSubmit={async (event) => {
           event.preventDefault();
           if (closed || isMutating || status !== "success") return;
-          if (await form.submit()) onSaved();
+          if (await form.submit()) {
+            onSaved();
+          } else {
+            setFailedSubmissions((count) => count + 1);
+          }
         }}
       >
         <fieldset
@@ -166,35 +181,36 @@ export function BookingForm({
               }}
             />
           </div>
-          {(form.error || form.overlapError) && (
-            <p className="notice notice--error" role="alert">
-              {form.error ?? form.overlapError}
-            </p>
-          )}
-          <div className="booking-form__actions">
-            <button
-              className="button button--primary"
-              type="submit"
-              disabled={status !== "success"}
-            >
-              {isSaving
-                ? "Saving…"
-                : booking
-                  ? "Save changes"
-                  : "Create booking"}
-            </button>
-            <button
-              className="button"
-              type="button"
-              onClick={() => {
-                form.reset();
-                onCancel();
-              }}
-            >
-              {booking ? "Cancel edit" : "Clear"}
-            </button>
-          </div>
         </fieldset>
+        {(form.error || form.overlapError) && (
+          <p className="notice notice--error" role="alert" tabIndex={-1}>
+            {form.error ?? form.overlapError}
+          </p>
+        )}
+        <div className="booking-form__actions">
+          <button
+            className="button button--primary"
+            type="submit"
+            disabled={closed || isMutating || status !== "success"}
+          >
+            {isSaving
+              ? "Saving…"
+              : booking
+                ? "Save changes"
+                : "Create booking"}
+          </button>
+          <button
+            className="button"
+            type="button"
+            disabled={isMutating}
+            onClick={() => {
+              form.reset();
+              onCancel();
+            }}
+          >
+            {booking ? "Cancel edit" : "Clear"}
+          </button>
+        </div>
         {!closed && status !== "success" && (
           <p className="booking-form__status" role="status">
             {status === "error"

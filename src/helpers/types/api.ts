@@ -1,4 +1,4 @@
-import type { T_BookingFieldErrors } from './booking';
+import type { T_BookingFieldErrors } from "./booking";
 
 export type T_ApiErrorResponse = {
   message: string;

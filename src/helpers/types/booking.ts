@@ -9,7 +9,7 @@ export type Booking = {
   title?: string;
 };
 
-export type CreateBookingInput = Omit<Booking, 'id'>;
+export type CreateBookingInput = Omit<Booking, "id">;
 
 /** PATCH fields are merged with the stored booking before validation. */
 export type UpdateBookingInput = Partial<CreateBookingInput>;
@@ -17,3 +17,12 @@ export type UpdateBookingInput = Partial<CreateBookingInput>;
 export type BookingField = keyof CreateBookingInput;
 
 export type BookingFieldErrors = Partial<Record<BookingField, string>>;
+
+export type BookingValidationResult =
+  | { valid: true }
+  | {
+      valid: false;
+      code: "VALIDATION_ERROR" | "BOOKING_CONFLICT";
+      message: string;
+      fieldErrors?: BookingFieldErrors;
+    };

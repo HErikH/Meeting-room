@@ -1,0 +1,93 @@
+.button {
+  font: inherit;
+  border: 1px solid #aab3c0;
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  color: inherit;
+  background: white;
+  cursor: pointer;
+  min-height: 44px;
+
+  &:hover:not(:disabled) {
+    background: #f0f3f8;
+  }
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &--primary {
+    background: #244f9f;
+    border-color: #244f9f;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #1c3d7c;
+    }
+  }
+
+  &--danger {
+    color: #a0231b;
+  }
+}
+
+.input {
+  font: inherit;
+  border: 1px solid #aab3c0;
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  color: inherit;
+  background: white;
+
+  &:disabled {
+    background: #f3f4f6;
+  }
+  &--invalid {
+    border-color: #b42318;
+  }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  &__label {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  &__hint {
+    color: #596579;
+    font-size: 0.9rem;
+  }
+  &__error {
+    color: #a0231b;
+    font-size: 0.85rem;
+  }
+}
+
+.panel {
+  background: white;
+  border: 1px solid #d7dde5;
+  border-radius: 10px;
+  padding: 1.5rem;
+
+  @media (max-width: $md) {
+    padding: 1rem;
+  }
+}
+
+.notice {
+  padding: 0.8rem;
+  border-radius: 6px;
+  margin: 0.75rem 0;
+  overflow-wrap: anywhere;
+
+  &--error {
+    color: #9d2118;
+    background: #fff2f0;
+  }
+}

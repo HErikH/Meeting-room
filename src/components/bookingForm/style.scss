@@ -1,0 +1,56 @@
+.booking-form {
+  &__heading {
+    font-size: 1.2rem;
+  }
+  &__description {
+    color: #596579;
+    font-size: 0.9rem;
+    margin: 0.5rem 0 1.25rem;
+  }
+  &__closed-message {
+    margin: 0.5rem 0 1.25rem;
+  }
+  &__fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+
+  &__legend {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  &__time-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  &__field {
+    margin-bottom: 1rem;
+  }
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  &__status {
+    color: #596579;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: $xsm) {
+    &__time-fields {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+  }
+}

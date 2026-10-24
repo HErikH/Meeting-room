@@ -1,6 +1,6 @@
 # Meeting room booking
 
-React, TypeScript, Vite, Zustand, and Sass. The project currently includes the foundation, business rules, and an asynchronous in-memory booking API. The booking interface and Zustand actions are next.
+Meeting room booking interface built with React, TypeScript, Vite, Zustand, and Sass, backed by a small asynchronous in-memory API.
 
 ## Run
 
@@ -12,7 +12,7 @@ npm ci
 npm run dev
 ```
 
-The app currently renders an empty shell. No API setup or server process is required.
+Open the URL printed by Vite. No API setup or server process is required.
 
 ```sh
 npm run lint
@@ -37,6 +37,22 @@ For a repeatable conflict, open the app with `?mockConflict=once`. The next vali
 
 UI code should use the shared `bookingsApi` export. To connect a real backend later, replace these four methods with network calls while retaining their signatures.
 
+## Interface and state
+
+- Select a date to view its bookings. Past dates remain viewable.
+- Create, edit, and delete bookings. The form checks working hours, duration, past time, and overlaps.
+- The Zustand bookings store owns the selected date, fetched list, loading/errors, and mutation actions. Stale date responses are ignored.
+- `App` renders `BookingPage`; `DateToolbar` owns the date controls, and `useBookingEditor` owns editing, dirty checks, confirmations, and notices. The store's `changeDate` action selects and loads a date, with separate save/delete/refresh actions.
+- Clock subscriptions live in the form and time-sensitive Today/Edit buttons. Clock ticks do not rerender the page. Edit focus uses an input ref inside `BookingForm`.
+- Form values and validation feedback stay in local React state. A `409` refreshes bookings and keeps the entered values and editing ID. If that refresh also fails, the list offers Retry while the draft remains intact.
+- Successful writes update the displayed list before refreshing it. A failed refresh does not report the completed save as a failed save.
+- Saving/deleting disables competing mutations. Changing dates or editing another booking asks before discarding unsaved details.
+- Loading, empty, error, saving, deleting, and success states are displayed. The layout stacks on narrow screens and uses labeled native controls, focus indicators, and announced status/error messages.
+- Styles use BEM (`block__element--modifier`), with component SCSS files and shared button/input/field/panel/notice blocks in `src/styles/components.scss`.
+- `src/styles/base.scss` forwards shared Sass variables, mixins, and functions without emitting CSS. Vite injects it with `@use "@/styles/base" as *;`, so stylesheets imported from TypeScript can use shared variables directly (`$md`, `$xsm`). Import CSS-producing stylesheets from TypeScript so each receives that injection; Sass modules loaded through `@use` have their own scope. Keep stylesheet-specific variables in separate modules and `@use` them only where needed.
+
+To try conflict recovery, open `/?mockConflict=once`, select tomorrow, enter a valid interval and title, and create the booking. The conflict appears alongside the refreshed list, with the form values retained. Choose an adjacent interval and submit again.
+
 ## Business decisions
 
 - One room; calendar dates and times use the browser's local timezone.
@@ -48,4 +64,4 @@ UI code should use the shared `bookingsApi` export. To connect a real backend la
 
 ## Remaining work
 
-Remaining: date/list UI, controlled booking form, Zustand state/actions, conflict refresh and draft preservation, responsive/accessibility checks, deployment, and submission links. Actual time spent and final priorities will be recorded at submission.
+Remaining: visual polish, final review, deployment, and submission links. Actual time spent and final priorities will be recorded at submission.

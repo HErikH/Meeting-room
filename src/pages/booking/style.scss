@@ -1,0 +1,16 @@
+.booking-page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem;
+
+  &__header { margin-bottom: 2rem; }
+  &__title { font-size: clamp(1.5rem, 4vw, 2rem); line-height: 1.25; }
+  &__subtitle { color: #596579; font-size: 0.9rem; margin-top: 0.5rem; }
+  &__notice { min-height: 1.5rem; margin: 0.75rem 0; color: #22613b; }
+  &__layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, 1fr); gap: 1.5rem; align-items: start; }
+
+  @media (max-width: $md) {
+    padding: 1.5rem 1rem;
+    &__layout { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  }
+}

@@ -2,6 +2,20 @@
 
 Meeting room booking interface built with React, TypeScript, Vite, Zustand, and Sass, backed by a small asynchronous in-memory API.
 
+## Submission
+
+- [Source repository](https://github.com/HErikH/Meeting-room) · [Main branch commit history](https://github.com/HErikH/Meeting-room/commits/main/)
+- [Live demo](https://meetingroombookingapp.netlify.app/)
+- AI chat links: The following conversations document the main stages of planning, implementation, and refactoring:
+
+- [Architecture Planning and Main Discussion](https://chatgpt.com/s/cx_6add02c50ce88191822c86861ce9fcb8) — Planned the application architecture and discussed the main implementation approach.
+- [UI Refinement and Component Reusability](https://chatgpt.com/s/cx_6add02f292108191a026cea4d0a62ebc) — Refined the UI, decoupled components, and improved reusability.
+- [App.tsx Review and Refactoring](https://chatgpt.com/s/cx_6add0323cccc819191747997ed478c63) — Reviewed `App.tsx` and refactored the code to improve its structure and maintainability.
+
+- In addition to these main conversations, several shorter discussions were used for intermediate refactoring tasks, incremental improvements, and focused problem-solving. These conversations were deleted during chat cleanup to keep the discussion history organized, so they are not included here.
+
+- Actual time spent: **approximately 6.5 hours** (assignment estimate: 4–6 hours).
+
 ## Run
 
 Use Node 24 (recommended), or another version allowed by `package.json`.
@@ -99,28 +113,43 @@ The editor stores the pending date/edit/delete action in React state. Cancelling
 
 Use tomorrow for the normal booking flow so the checks do not depend on the current time.
 
-| Check | Expected behavior |
-| --- | --- |
-| Create 09:00–09:30 and 16:00–18:00 | Both duration limits and working-hour boundaries are accepted |
-| Create 10:00–10:29, 10:00–12:01, or equal/reversed times | Field errors appear and nothing is saved |
-| Create 10:00–11:00, then 11:00–12:00 | Adjacent bookings are accepted; overlapping intervals are rejected |
-| Edit a booking's title without changing its interval | No self-conflict |
-| Open `?mockConflict=once` and submit a valid booking | Conflict message, refreshed list, and retained draft; correct the interval and retry |
-| Refresh or change dates quickly | Selected date stays consistent; refresh keeps any draft |
-| Change dates with unsaved values and dismiss confirmation | Original date and entered values stay visible |
-| Delete a booking | Confirmation, pending state, and updated list |
-| View yesterday or enter past time today | Creation is unavailable; past bookings remain viewable |
-| Submit invalid values with a keyboard | Focus moves to the first invalid field; errors are associated with their fields |
-| View at 320px and use Tab through the interface | No horizontal overflow, visible focus, and labeled controls |
+| Check                                                     | Expected behavior                                                                    |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Create 09:00–09:30 and 16:00–18:00                        | Both duration limits and working-hour boundaries are accepted                        |
+| Create 10:00–10:29, 10:00–12:01, or equal/reversed times  | Field errors appear and nothing is saved                                             |
+| Create 10:00–11:00, then 11:00–12:00                      | Adjacent bookings are accepted; overlapping intervals are rejected                   |
+| Edit a booking's title without changing its interval      | No self-conflict                                                                     |
+| Open `?mockConflict=once` and submit a valid booking      | Conflict message, refreshed list, and retained draft; correct the interval and retry |
+| Refresh or change dates quickly                           | Selected date stays consistent; refresh keeps any draft                              |
+| Change dates with unsaved values and dismiss confirmation | Original date and entered values stay visible                                        |
+| Delete a booking                                          | Confirmation, pending state, and updated list                                        |
+| View yesterday or enter past time today                   | Creation is unavailable; past bookings remain viewable                               |
+| Submit invalid values with a keyboard                     | Focus moves to the first invalid field; errors are associated with their fields      |
+| View at 320px and use Tab through the interface           | No horizontal overflow, visible focus, and labeled controls                          |
 
 The in-memory API can reject a save independently of the UI. Refresh failures, conflict-plus-refresh failures, and failed deletes were also checked in a temporary browser session; no test runner or test files are included.
 
-## Deployment and submission
+## Deployment
 
-This is a static Vite app. On Vercel or Netlify, use Node 24, build command `npm run build`, and output directory `dist`. There is no separate API process, environment configuration, or database. Reloading the deployed demo resets its in-memory data.
+The demo is hosted on Netlify. This is a static Vite app: use Node 24, build command `npm run build`, and output directory `dist`. There is no separate API process, environment configuration, or database. Reloading the deployed demo resets its in-memory data.
 
-Before submitting, include the repository link, deployed demo link, this AI conversation, and actual time spent in the README. No hosted demo has been created yet.
+To review conflict recovery directly, open the [demo with a simulated conflict](https://meetingroombookingapp.netlify.app/?mockConflict=once) and follow the steps above.
 
-## Remaining work
+## Completion status and limitations
 
-Remaining: deployment and submission links. Actual time spent and final priorities will be recorded at submission.
+Implemented: date-scoped booking CRUD, shared UI/API validation, conflict recovery with draft preservation, asynchronous loading and mutation states, confirmation dialogs, responsive BEM styles, and basic keyboard/accessibility support. Build and lint passed; browser verification covered booking boundaries, self-editing, conflicts, retries, pending states, stale responses, confirmations, and layouts from 320px to desktop.
+
+Scope decisions:
+
+- One meeting room, with no user or room management. Authentication, a real backend, a database, and integrations are outside this assignment.
+- The mock API keeps setup small and repeats validation before writes, but bookings are temporary and isolated to each tab. The conflict scenario simulates another participant; there is no real shared concurrency between browsers.
+- No automated test suite is included. The manual verification checklist above documents the important scenarios.
+
+## What couldn't do / Future Improvements
+
+- **Centralize Text Content:** Move conditional text rendering and static content into dedicated constants or configuration objects instead of defining them directly inside components. This will improve readability and make content easier to manage.
+- **Performance Optimization:** Review and verify performance optimizations, as a thorough optimization assessment has not yet been completed.
+- **Improve SOLID Compliance:** Further refactor parts of the codebase to better adhere to SOLID principles and improve separation of concerns.
+- **Code Cleanup and Refactoring:** Address remaining refactoring opportunities, remove unnecessary code, and improve consistency across the codebase.
+- **Centralize UI Text and Descriptions:** Move text content, descriptions, labels, and other UI strings into centralized constant objects. This will reduce clutter in components, simplify content management, and make future internationalization easier to implement, including in components such as `BookingForm`.
+- **Multiple rooms**: Associate bookings with a room ID and check conflicts separately for each room.
